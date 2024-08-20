@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+</body>
+</html>
+<html lang="ru"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кликер</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+        #clicker-container {
+            text-align: center;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        #count {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        #click-button {
+            font-size: 24px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        #click-button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+<div id="clicker-container">
+    <div id="count">18</div>
+    <button id="click-button">Кликни меня!</button>
+</div>
+
+<script>
+    // Находим элементы на странице
+    const countDisplay = document.getElementById('count');
+    const clickButton = document.getElementById('click-button');
+
+    // Инициализируем счётчик
+    let count = 0;
+
+    // Обработчик клика
+    clickButton.addEventListener('click', () => {
+        count++;
+        countDisplay.textContent = count;
+    });
+</script>
+
+
+</body></html>
