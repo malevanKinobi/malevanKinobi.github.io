@@ -188,7 +188,7 @@ function init() {
     dirLight.position.set(10, 20, 0);
     scene.add(dirLight);
 
-    // настройки рендера  
+    // настройки рендера
     renderer = new THREE.WebGLRenderer({ antialias: false, alpha: true });
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -525,15 +525,17 @@ function updatePhysics(timePassed) {
 
 // обрабатываем изменение размеров окна
 window.addEventListener("resize", () => {
-    // выравниваем положение камеры
-    // получаем новые размеры и ставим камеру пропорционально новым размерам
     const aspect = window.innerWidth / window.innerHeight;
     const width = 10;
     const height = width / aspect;
+
+    camera.left = width / -2;
+    camera.right = width / 2;
     camera.top = height / 2;
     camera.bottom = height / -2;
+    camera.updateProjectionMatrix();
 
-    // обновляем внешний вид сцены
     renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
     renderer.render(scene, camera);
 });
