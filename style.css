@@ -1,0 +1,101 @@
+/* Обычное начертание */
+@font-face {
+    font-family: 'Roboto';
+    src: url('fonts/roboto/Roboto-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+/* Жирное начертание */
+@font-face {
+    font-family: 'Roboto';
+    src: url('fonts/roboto/Roboto-Bold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+}
+
+/* Курсив */
+@font-face {
+    font-family: 'Roboto';
+    src: url('fonts/roboto/Roboto-Italic.ttf') format('truetype');
+    font-weight: normal;
+    font-style: italic;
+}
+
+/* Жирный курсив */
+@font-face {
+    font-family: 'Roboto';
+    src: url('fonts/roboto/Roboto-BoldItalic.ttf') format('truetype');
+    font-weight: bold;
+    font-style: italic;
+}
+
+
+/* общие настройки страницы */
+body {
+    /*  убираем отступы  */
+    margin: 0;
+    /* цвет шрифта и сам шрифт */
+    color: white;
+    font-family: "Roboto", sans-serif;
+}
+
+#particles-js {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: -1; /* Задает фон, чтобы частицы были за основным содержимым */
+    background-color: #000; /* Задайте цвет фона, если требуется */
+}
+
+/* выводим сообщение о конце игры и инструкцию по центру своих блоков */
+#results, #instructions {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+    /* затемняем фон */
+    background-color: rgba(20, 20, 20, 0.75);
+}
+
+/* сообщение о конце игры не показываем на старте */
+#results {
+    display: none;
+    cursor: default;
+}
+
+/* отступы в текстах */
+#results .content,
+#instructions .content {
+    margin: 0 auto;
+}
+
+/* настройка вывода набранных очков в правом верхнем углу */
+#score {
+    font-family: "Roboto", sans-serif;
+    position: absolute;
+    color: #414141;
+    font-size: 200px;
+    font-weight: bold;
+    top: 10%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+#btn_again, #btn_start
+{
+    font-family: "Roboto", sans-serif;
+    text-align: center;
+    font-weight: bolder;
+    padding: 70px 160px;
+    border: none;
+    background-color: #755fcb;
+    color: #eae3e3;
+    font-size: 40px;
+    border-radius: 10px;
+}
+

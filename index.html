@@ -1,74 +1,51 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru" >
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Пирамида</title>
+    <!-- подключаем стили -->
+    <link rel="stylesheet" href="style.css">
+
 </head>
 <body>
-    
-</body>
-</html>
-<html lang="ru"><head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Кликер</title>
-    <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f0f0f0;
-            font-family: Arial, sans-serif;
-        }
-        #clicker-container {
-            text-align: center;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        #count {
-            font-size: 48px;
-            margin-bottom: 20px;
-        }
-        #click-button {
-            font-size: 24px;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            background-color: #4CAF50;
-            color: #fff;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        #click-button:hover {
-            background-color: #45a049;
-        }
-    </style>
-</head>
-<body>
-<div id="clicker-container">
-    <div id="count">18</div>
-    <button id="click-button">Кликни меня!</button>
+<div id="particles-js"></div>
+<!-- блок с инструкциями -->
+<div id="instructions">
+
+    <div class="content">
+        <button id="btn_start">НАЧАТЬ</button>
+<!--        <p>Ставьте блоки друг на друга.</p>-->
+<!--        <p>Щёлкните мышкой или нажмите пробел, когда блок будет над пирамидой. Сможете дойти до синих блоков?</p>-->
+<!--        <p>Щёлкните мышкой или нажмите пробел, чтобы начать игру.</p>-->
+    </div>
 </div>
+<!-- блок с результатами игры -->
+<div id="results">
+
+    <div class="content">
+        <button id="btn_again">ЗАНОВО</button>
+<!--        <p>Вы промахнулись</p>-->
+<!--        <p>Для перезапуска игры нажмите R</p>-->
+    </div>
+</div>
+<!-- блок с очками -->
+
+<div id="score">0</div>
+<!-- подключаем Three.js -->
+<script src='https://cdnjs.cloudflare.com/ajax/libs/three.js/r124/three.min.js'></script>
+<!-- подключаем Cannon.js -->
+<script src='https://cdnjs.cloudflare.com/ajax/libs/cannon.js/0.6.2/cannon.min.js'></script>
+
+<!-- Подключение particles.js через CDN -->
+<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+
+<!-- подключаем наш скрипт -->
+<script  src="script.js"></script>
 
 <script>
-    // Находим элементы на странице
-    const countDisplay = document.getElementById('count');
-    const clickButton = document.getElementById('click-button');
-
-    // Инициализируем счётчик
-    let count = 0;
-
-    // Обработчик клика
-    clickButton.addEventListener('click', () => {
-        count++;
-        countDisplay.textContent = count;
-    });
+    particlesJS("particles-js", {"particles":{"number":{"value":80,"density":{"enable":true,"value_area":800}},"color":{"value":"#c150ff"},"shape":{"type":"star","stroke":{"width":0,"color":"#7584f5"},"polygon":{"nb_sides":5},"image":{"src":"img/github.svg","width":100,"height":100}},"opacity":{"value":0.5050544906446545,"random":false,"anim":{"enable":false,"speed":1,"opacity_min":0.1,"sync":false}},"size":{"value":8.017060304327615,"random":true,"anim":{"enable":true,"speed":19.489853095232284,"size_min":4.87246327380807,"sync":true}},"line_linked":{"enable":true,"distance":160.3412060865523,"color":"#4b37e3","opacity":0.14430708547789706,"width":3.206824121731046},"move":{"enable":true,"speed":6,"direction":"none","random":false,"straight":false,"out_mode":"out","bounce":false,"attract":{"enable":false,"rotateX":600,"rotateY":1200}}},"interactivity":{"detect_on":"canvas","events":{"onhover":{"enable":false,"mode":"repulse"},"onclick":{"enable":false,"mode":"push"},"resize":true},"modes":{"grab":{"distance":400,"line_linked":{"opacity":1}},"bubble":{"distance":400,"size":40,"duration":2,"opacity":8,"speed":3},"repulse":{"distance":200,"duration":0.4},"push":{"particles_nb":4},"remove":{"particles_nb":2}}},"retina_detect":true});var count_particles, stats, update; stats = new Stats; stats.setMode(0); stats.domElement.style.position = 'absolute'; stats.domElement.style.left = '0px'; stats.domElement.style.top = '0px'; document.body.appendChild(stats.domElement); count_particles = document.querySelector('.js-count-particles'); update = function() { stats.begin(); stats.end(); if (window.pJSDom[0].pJS.particles && window.pJSDom[0].pJS.particles.array) { count_particles.innerText = window.pJSDom[0].pJS.particles.array.length; } requestAnimationFrame(update); }; requestAnimationFrame(update);;
 </script>
 
 
-</body></html>
+</body>
+</html>
