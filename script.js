@@ -160,7 +160,7 @@ function init() {
         width / -2,
         width / 2,
         height / 2,
-        height / -2,
+        height / -5,
         0,
         100
     );
