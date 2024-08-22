@@ -316,7 +316,7 @@ function splitBlockAndAddNextOneIfOverlaps() {
     // если есть что отрезать (если есть свес)
     if (overlap > 0) {
 
-        if (cutPercentage > 20)
+        if (cutPercentage > 10)
         {
 
             // отрезаем
@@ -369,7 +369,7 @@ function splitBlockAndAddNextOneIfOverlaps() {
             topLayer.cannonjs.angularVelocity.set(0, 0, 0);
 
             // Трижды моргаем цветом при постановке блока
-            flashColorWithVibration(topLayer.threejs, 0xFFFFDD); // Меняем цвет на желтый
+            flashColorWithVibrationAndSound(topLayer.threejs, 0xFFFFDD, '374615055f77af8.mp3'); // Меняем цвет на желтый
 
             // формируем следующий блок
             // отодвигаем их подальше от пирамиды на старте
@@ -381,7 +381,7 @@ function splitBlockAndAddNextOneIfOverlaps() {
             console.log({newWidth, newDepth})
             // меняем направление относительно предыдущего
             const nextDirection = direction == "x" ? "z" : "x";
-
+            if (scoreElement) scoreElement.innerText = stack.length - 1;
             addLayer(nextX, nextZ, newWidth, newDepth, nextDirection);
         }
     }
@@ -391,10 +391,19 @@ function splitBlockAndAddNextOneIfOverlaps() {
     }
 }
 
+// Функция для воспроизведения звука
+function playSound(soundFile) {
+    const audio = new Audio(soundFile);
+    audio.play();
+}
+
 // Функция для трижды изменения цвета блока и добавления вибрации
-function flashColorWithVibration(block, newColor, duration = 50, times = 3) {
+function flashColorWithVibrationAndSound(block, newColor, soundFile, duration = 50, times = 3) {
     // Сохраняем исходный цвет
     const originalColor = block.material.color.getHex();
+
+    // Воспроизводим звук
+    playSound(soundFile);
 
     // Функция для моргания
     function toggleColor(currentTime) {
