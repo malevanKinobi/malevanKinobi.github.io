@@ -139,7 +139,7 @@ function init() {
     stack = [];
     overhangs = [];
     // задаём точность игры на автопилое
-    robotPrecision = Math.random() * 1 - 0.5;
+    robotPrecision = Math.random() * 1 - 0.1;
 
     // запускаем движок CannonJS
     world = new CANNON.World();
@@ -167,7 +167,7 @@ function init() {
 
     // устанавливаем камеру в нужную точку и говорим, что она смотрит точно на центр сцены
     camera.position.set(4, 4, 4);
-    camera.lookAt(0, 0, 0);
+    camera.lookAt(0, 1, 0);
 
     // создаём новую сцену
     scene = new THREE.Scene();
@@ -311,50 +311,114 @@ function splitBlockAndAddNextOneIfOverlaps() {
     // размер отрезаемой части
     const overlap = size - overhangSize;
 
+    const cutPercentage = (overhangSize / size) * 100;
+    console.log(cutPercentage)
     // если есть что отрезать (если есть свес)
     if (overlap > 0) {
-        // отрезаем
-        cutBox(topLayer, overlap, size, delta);
 
-        // считаем размер свеса
-        const overhangShift = (overlap / 2 + overhangSize / 2) * Math.sign(delta);
-        // если обрезка была по оси X
-        const overhangX =
-            direction == "x"
-                ? topLayer.threejs.position.x + overhangShift
-                : topLayer.threejs.position.x;
-        // если обрезка была по оси Z
-        const overhangZ =
-            direction == "z"
-                // то добавляем размер свеса к начальным координатам по этой оси
-                ? topLayer.threejs.position.z + overhangShift
-                : topLayer.threejs.position.z;
-        // если свес был по оси X, то получаем ширину, а если по Z — то глубину
-        const overhangWidth = direction == "x" ? overhangSize : topLayer.width;
-        const overhangDepth = direction == "z" ? overhangSize : topLayer.depth;
+        if (cutPercentage > 20)
+        {
 
-        // рисуем новую фигуру после обрезки, которая будет падать вних
-        addOverhang(overhangX, overhangZ, overhangWidth, overhangDepth);
+            // отрезаем
+            cutBox(topLayer, overlap, size, delta);
 
-        // формируем следующий блок
-        // отодвигаем их подальше от пирамиды на старте
-        const nextX = direction == "x" ? topLayer.threejs.position.x : -10;
-        const nextZ = direction == "z" ? topLayer.threejs.position.z : -10;
-        // новый блок получает тот же размер, что и текущий верхний
-        const newWidth = topLayer.width;
-        const newDepth = topLayer.depth;
-        // меняем направление относительно предыдущего
-        const nextDirection = direction == "x" ? "z" : "x";
+            // считаем размер свеса
+            const overhangShift = (overlap / 2 + overhangSize / 2) * Math.sign(delta);
+            // если обрезка была по оси X
+            const overhangX =
+                direction == "x"
+                    ? topLayer.threejs.position.x + overhangShift
+                    : topLayer.threejs.position.x;
+            // если обрезка была по оси Z
+            const overhangZ =
+                direction == "z"
+                    // то добавляем размер свеса к начальным координатам по этой оси
+                    ? topLayer.threejs.position.z + overhangShift
+                    : topLayer.threejs.position.z;
+            // если свес был по оси X, то получаем ширину, а если по Z — то глубину
+            const overhangWidth = direction == "x" ? overhangSize : topLayer.width;
+            const overhangDepth = direction == "z" ? overhangSize : topLayer.depth;
 
-        // если идёт подсчёт очков — выводим текущее значение
-        if (scoreElement) scoreElement.innerText = stack.length - 1;
-        // добавляем в сцену новый блок
-        addLayer(nextX, nextZ, newWidth, newDepth, nextDirection);
-        // если свеса нет и игрок полностью промахнулся мимо пирамиды
-    } else {
+            // рисуем новую фигуру после обрезки, которая будет падать вних
+            addOverhang(overhangX, overhangZ, overhangWidth, overhangDepth);
+
+            // формируем следующий блок
+            // отодвигаем их подальше от пирамиды на старте
+            const nextX = direction == "x" ? topLayer.threejs.position.x : -10;
+            const nextZ = direction == "z" ? topLayer.threejs.position.z : -10;
+            // новый блок получает тот же размер, что и текущий верхний
+            const newWidth = topLayer.width;
+            const newDepth = topLayer.depth;
+            // меняем направление относительно предыдущего
+            const nextDirection = direction == "x" ? "z" : "x";
+
+            // если идёт подсчёт очков — выводим текущее значение
+            if (scoreElement) scoreElement.innerText = stack.length - 1;
+            // добавляем в сцену новый блок
+            addLayer(nextX, nextZ, newWidth, newDepth, nextDirection);
+            // если свеса нет и игрок полностью промахнулся мимо пирамиды
+        }
+        else
+        {
+            // Устанавливаем блок точно по центру предыдущего слоя
+            topLayer.threejs.position[direction] = previousLayer.threejs.position[direction];
+            topLayer.cannonjs.position[direction] = previousLayer.threejs.position[direction];
+
+            // Обнуляем скорость и угловую скорость блока в физическом мире, чтобы он оставался на месте
+            topLayer.cannonjs.velocity.set(0, 0, 0);
+            topLayer.cannonjs.angularVelocity.set(0, 0, 0);
+
+            // Трижды моргаем цветом при постановке блока
+            flashColorWithVibration(topLayer.threejs, 0xFFFFDD); // Меняем цвет на желтый
+
+            // формируем следующий блок
+            // отодвигаем их подальше от пирамиды на старте
+            const nextX = direction == "x" ? topLayer.threejs.position.x : -10;
+            const nextZ = direction == "z" ? topLayer.threejs.position.z : -10;
+            // новый блок получает тот же размер, что и текущий верхний
+            const newWidth = topLayer.width;
+            const newDepth = topLayer.depth;
+            console.log({newWidth, newDepth})
+            // меняем направление относительно предыдущего
+            const nextDirection = direction == "x" ? "z" : "x";
+
+            addLayer(nextX, nextZ, newWidth, newDepth, nextDirection);
+        }
+    }
+    else {
         // обрабатываем промах
         missedTheSpot();
     }
+}
+
+// Функция для трижды изменения цвета блока и добавления вибрации
+function flashColorWithVibration(block, newColor, duration = 50, times = 3) {
+    // Сохраняем исходный цвет
+    const originalColor = block.material.color.getHex();
+
+    // Функция для моргания
+    function toggleColor(currentTime) {
+        // Если количество морганий ещё не достигло нужного числа
+        if (currentTime < times * 2) {
+            // Меняем цвет
+            const isOriginalColor = currentTime % 2 === 0;
+            block.material.color.setHex(isOriginalColor ? newColor : originalColor);
+
+            // Если это первый раз, добавляем вибрацию
+            if (currentTime === 0 && navigator.vibrate) {
+                navigator.vibrate([200, 100, 200]); // Вибрация на 200 мс, пауза 100 мс, затем снова вибрация 200 мс
+            }
+
+            // Запускаем следующий цикл через указанное время
+            setTimeout(() => toggleColor(currentTime + 1), duration);
+        } else {
+            // Возвращаем цвет в конце, чтобы гарантировать, что он вернется к исходному
+            block.material.color.setHex(originalColor);
+        }
+    }
+
+    // Запускаем первый цикл
+    toggleColor(0);
 }
 
 // обрабатываем промах
