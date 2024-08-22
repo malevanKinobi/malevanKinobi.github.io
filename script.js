@@ -379,7 +379,7 @@ function splitBlockAndAddNextOneIfOverlaps() {
             // Обнуляем скорость и угловую скорость блока в физическом мире, чтобы он оставался на месте
             topLayer.cannonjs.velocity.set(0, 0, 0);
             topLayer.cannonjs.angularVelocity.set(0, 0, 0);
-
+ 
 
 
             // Трижды моргаем цветом при постановке блока
