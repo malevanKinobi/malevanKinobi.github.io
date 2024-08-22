@@ -189,7 +189,7 @@ function init() {
     scene.add(dirLight);
 
     // настройки рендера
-    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer = new THREE.WebGLRenderer({ antialias: false, alpha: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setAnimationLoop(animation);
     renderer.setClearColor(new THREE.Color(0xc8b1ed), 0.9);
