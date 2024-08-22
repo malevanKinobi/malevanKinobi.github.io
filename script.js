@@ -152,7 +152,7 @@ function init() {
 
     // высчитываем соотношения высоты и ширины, чтобы пирамида выглядела пропорционально окну браузера
     const aspect = window.innerWidth / window.innerHeight;
-    const width = 10; 
+    const width = 7;
     const height = width / aspect;
 
     // Включаем ThreeJs и добавляем камеру, от лица которой мы будем смотреть на пирамиду
@@ -188,8 +188,9 @@ function init() {
     dirLight.position.set(10, 20, 0);
     scene.add(dirLight);
 
-    // настройки рендера
+    // настройки рендера  
     renderer = new THREE.WebGLRenderer({ antialias: false, alpha: true });
+    renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setAnimationLoop(animation);
     renderer.setClearColor(new THREE.Color(0xc8b1ed), 0.9);
