@@ -367,7 +367,7 @@ function splitBlockAndAddNextOneIfOverlaps() {
             // Обнуляем скорость и угловую скорость блока в физическом мире, чтобы он оставался на месте
             topLayer.cannonjs.velocity.set(0, 0, 0);
             topLayer.cannonjs.angularVelocity.set(0, 0, 0);
- 
+
             // Трижды моргаем цветом при постановке блока
             flashColorWithVibration(topLayer.threejs, 0xFFFFDD); // Меняем цвет на желтый
 
@@ -406,7 +406,7 @@ function flashColorWithVibration(block, newColor, duration = 50, times = 3) {
 
             // Если это первый раз, добавляем вибрацию
             if (currentTime === 0 && navigator.vibrate) {
-                navigator.vibrate([200, 100, 200]); // Вибрация на 200 мс, пауза 100 мс, затем снова вибрация 200 мс
+                navigator.vibrate([100, 100, 100]); // Вибрация на 200 мс, пауза 100 мс, затем снова вибрация 200 мс
             }
 
             // Запускаем следующий цикл через указанное время
