@@ -24,6 +24,7 @@ let robotPrecision;
 let is_started = false;
 let startDelay = 500;
 let canHandleEvent = false;
+let correctTaps = 0;
 // получаем доступ на странице к разделам с очками, правилами и результатами
 const scoreElement = document.getElementById("score");
 const instructionsElement = document.getElementById("instructions");
@@ -160,14 +161,14 @@ function init() {
         width / -2,
         width / 2,
         height / 2,
-        height / -5,
+        height / -2,
         0,
         100
     );
 
     // устанавливаем камеру в нужную точку и говорим, что она смотрит точно на центр сцены
     camera.position.set(4, 4, 4);
-    camera.lookAt(0, 1, 0);
+    camera.lookAt(0, 0, 0);
 
     // создаём новую сцену
     scene = new THREE.Scene();
@@ -193,7 +194,7 @@ function init() {
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setAnimationLoop(animation);
-    renderer.setClearColor(new THREE.Color(0xc8b1ed), 0.9);
+    //renderer.setClearColor(new THREE.Color(0xc8b1ed), 0.9);
     // добавляем на страницу отрендеренную сцену
     document.body.appendChild(renderer.domElement);
     renderer.render(scene, camera);
@@ -313,14 +314,23 @@ function splitBlockAndAddNextOneIfOverlaps() {
     const overlap = size - overhangSize;
 
     const cutPercentage = (overhangSize / size) * 100;
-    console.log(cutPercentage)
     // если есть что отрезать (если есть свес)
     if (overlap > 0) {
 
         if (cutPercentage > 10)
         {
+            correctTaps = 0;
             // отрезаем
             cutBox(topLayer, overlap, size, delta);
+
+            const soundСabinList = ['1.mp3', '3.mp3', '4.mp3', '5.mp3'];
+            // Генерация случайного индекса
+            const randomIndexsoundСabin = Math.floor(Math.random() * soundСabinList.length);
+
+// Выбор случайного элемента
+            const randomsoundСabin = soundСabinList[randomIndexsoundСabin];
+            console.log(randomsoundСabin)
+            playSound(randomsoundСabin);
 
             // считаем размер свеса
             const overhangShift = (overlap / 2 + overhangSize / 2) * Math.sign(delta);
@@ -360,6 +370,8 @@ function splitBlockAndAddNextOneIfOverlaps() {
         }
         else
         {
+            correctTaps++;
+
             // Устанавливаем блок точно по центру предыдущего слоя
             topLayer.threejs.position[direction] = previousLayer.threejs.position[direction];
             topLayer.cannonjs.position[direction] = previousLayer.threejs.position[direction];
@@ -371,7 +383,13 @@ function splitBlockAndAddNextOneIfOverlaps() {
 
 
             // Трижды моргаем цветом при постановке блока
-            flashColorWithVibrationAndSound(topLayer.threejs, 0xFFFFDD, '374615055f77af8.mp3'); // Меняем цвет на желтый
+            flashColorWithVibrationAndSound(topLayer.threejs, 0xFFFFDD, '2181b19773767a7.mp3'); // Меняем цвет на желтый
+
+            // Проверяем, если 5 правильных тапов подряд
+            if (correctTaps === 5) {
+                increaseBlockSize(topLayer, 1.1, originalBoxSize);
+                correctTaps = 0; // Сбрасываем счетчик после увеличения
+            }
 
             // формируем следующий блок
             // отодвигаем их подальше от пирамиды на старте
@@ -380,7 +398,6 @@ function splitBlockAndAddNextOneIfOverlaps() {
             // новый блок получает тот же размер, что и текущий верхний
             const newWidth = topLayer.width;
             const newDepth = topLayer.depth;
-            console.log({newWidth, newDepth})
             // меняем направление относительно предыдущего
             const nextDirection = direction == "x" ? "z" : "x";
             if (scoreElement) scoreElement.innerText = stack.length - 1;
@@ -392,6 +409,30 @@ function splitBlockAndAddNextOneIfOverlaps() {
         missedTheSpot();
     }
 }
+
+// Функция для увеличения размера блока на 1.1 раз, но не больше originalBoxSize
+function increaseBlockSize(block, scaleMultiplier, maxSize) {
+    const newWidth = Math.min(block.width * scaleMultiplier, maxSize);
+    const newDepth = Math.min(block.depth * scaleMultiplier, maxSize);
+
+    // Обновляем масштаб блока в Three.js
+    block.threejs.scale.x = newWidth / block.width;
+    block.threejs.scale.z = newDepth / block.depth;
+
+    // Обновляем физическое тело в Cannon.js
+    block.cannonjs.shapes.forEach(shape => {
+        shape.halfExtents.x = newWidth / 2;
+        shape.halfExtents.z = newDepth / 2;
+        shape.updateConvexPolyhedronRepresentation();
+    });
+
+    block.cannonjs.updateBoundingRadius();
+
+    // Обновляем размеры блока
+    block.width = newWidth;
+    block.depth = newDepth;
+}
+
 
 // Функция для воспроизведения звука
 function playSound(soundFile) {
