@@ -318,7 +318,6 @@ function splitBlockAndAddNextOneIfOverlaps() {
 
         if (cutPercentage > 10)
         {
-
             // отрезаем
             cutBox(topLayer, overlap, size, delta);
 
@@ -367,6 +366,8 @@ function splitBlockAndAddNextOneIfOverlaps() {
             // Обнуляем скорость и угловую скорость блока в физическом мире, чтобы он оставался на месте
             topLayer.cannonjs.velocity.set(0, 0, 0);
             topLayer.cannonjs.angularVelocity.set(0, 0, 0);
+
+
 
             // Трижды моргаем цветом при постановке блока
             flashColorWithVibrationAndSound(topLayer.threejs, 0xFFFFDD, '374615055f77af8.mp3'); // Меняем цвет на желтый
