@@ -152,7 +152,7 @@ function init() {
 
     // высчитываем соотношения высоты и ширины, чтобы пирамида выглядела пропорционально окну браузера
     const aspect = window.innerWidth / window.innerHeight;
-    const width = 50;
+    const width = 5;
     const height = width / aspect;
 
     // Включаем ThreeJs и добавляем камеру, от лица которой мы будем смотреть на пирамиду
