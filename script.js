@@ -390,7 +390,7 @@ function flashColorWithVibrationAndSound(block, newColor, soundFile, duration = 
             block.material.color.setHex(isOriginalColor ? newColor : originalColor);
 
             if (isMobileDevice())
-            {
+            { 
                 // Если это первый раз, добавляем вибрацию
                 if (currentTime === 0 && navigator.vibrate) {
                     navigator.vibrate([100, 100, 100]); // Вибрация на 200 мс, пауза 100 мс, затем снова вибрация 200 мс
