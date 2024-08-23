@@ -1,244 +1,224 @@
-// сразу переводим фокус на окно, чтобы можно было начать игру
+// Сразу переводим фокус на окно, чтобы можно было начать игру, не кликая по экрану
 window.focus();
 
-// объявляем переменные ThreeJS — камеру, сцену и рендер
+// Объявляем переменные ThreeJS — камера, сцена и рендер
 let camera, scene, renderer;
-// и сразу объявляем физический мир CannonJs
+// Объявляем переменную для физического мира CannonJs
 let world;
-// время последней анимации
+// Время последней анимации, используется для расчета прошедшего времени между кадрами
 let lastTime;
-// тут храним части пирамиды, которые уже стоят друг на друге
+// Массив для хранения частей пирамиды, которые уже стоят друг на друге
 let stack;
-// падающие части деталей, которые не поместились в границы пирамиды
+// Массив для хранения частей пирамиды, которые не поместились на вершине и упали
 let overhangs;
-// высота каждой детали
+// Высота каждой детали пирамиды
 const boxHeight = 1;
-// исходная высота и ширина каждой детали
+// Исходная ширина и глубина каждой детали пирамиды
 const originalBoxSize = 3;
 
-// переменные для игры на автопилоте и конца игры
-let autopilot;
-let gameEnded;
-// точность, с которой алгоритм будет играть на заставке
-let robotPrecision;
-let is_started = false;
-let startDelay = 500;
-let canHandleEvent = false;
-let correctTaps = 0;
-// получаем доступ на странице к разделам с очками, правилами и результатами
+// Переменные для управления игровым процессом и его состоянием
+let autopilot; // Флаг для управления режимом автопилота (демонстрационного режима)
+let gameEnded; // Флаг для отслеживания конца игры
+let robotPrecision; // Переменная для хранения точности автопилота
+let is_started = false; // Флаг для отслеживания состояния старта игры
+let startDelay = 500; // Задержка перед началом обработки событий после старта игры
+let canHandleEvent = false; // Флаг для разрешения обработки событий
+let correctTaps = 0; // Счетчик правильных нажатий
+
+// Получаем доступ к элементам на странице, связанным с очками, инструкциями и результатами
 const scoreElement = document.getElementById("score");
 const instructionsElement = document.getElementById("instructions");
 const resultsElement = document.getElementById("results");
 
+// Кнопки для управления стартом и перезапуском игры
 const btn_start = document.getElementById("btn_start");
 const btn_again = document.getElementById("btn_again");
 
+const gradients = [
+    { start: '#ff7e5f', end: '#feb47b' }, // Теплый закат
+    { start: '#6a11cb', end: '#2575fc' }, // Сине-фиолетовый
+    { start: '#ff9966', end: '#ff5e62' }, // Яркий апельсин
+    { start: '#00c6ff', end: '#0072ff' }, // Голубой океан
+    { start: '#76b852', end: '#8dc26f' }, // Зеленая трава
+    { start: '#dd3e54', end: '#6be585' }, // Красно-зеленый контраст
+    { start: '#f09819', end: '#edde5d' }, // Золотой свет
+    { start: '#ff512f', end: '#f09819' }, // Оранжевый закат
+    { start: '#c31432', end: '#240b36' }, // Красный и черный
+    { start: '#3a1c71', end: '#d76d77' }, // Фиолетово-розовый
+];
 
-
-// добавление нового слоя
+let colorBlock = Math.floor(Math.random() * 360);
+// Функция для добавления нового слоя к пирамиде
 function addLayer(x, z, width, depth, direction) {
-    // получаем высоту, на которой будем работать
+    // Рассчитываем высоту нового слоя на основе текущего количества слоев
     const y = boxHeight * stack.length;
-    // создаём новый слой на этой высоте
+    // Создаем новый слой, который добавляется на вершину пирамиды
     const layer = generateBox(x, y, z, width, depth, false);
-    // устанавливаем направление движения
+    // Устанавливаем направление движения для нового слоя
     layer.direction = direction;
-    // добавляем слой в массив с пирамидой
+    // Добавляем новый слой в массив stack, который содержит все слои пирамиды
     stack.push(layer);
 }
 
-// отрисовка игрового блока
+// Функция для создания и добавления игрового блока (кубика) на сцену
 function generateBox(x, y, z, width, depth, falls) {
-    // используем ThreeJS для создания коробки
+    // Создаем геометрию кубика с использованием ThreeJS
     const geometry = new THREE.BoxGeometry(width, boxHeight, depth);
-    // создаём цвет, материал и полигональную сетку, которая создаст нам коробку
-    const color = new THREE.Color(`hsl(${283 + stack.length * 10}, 50%, 50%)`);
+    // Генерируем цвет для кубика на основе его позиции в стеке
+    const color = new THREE.Color(`hsl(${colorBlock + stack.length * 10}, 50%, 50%)`);
+    // Создаем материал и полигональную сетку (меш) с использованием сгенерированного цвета
     const material = new THREE.MeshLambertMaterial({ color });
     const mesh = new THREE.Mesh(geometry, material);
-    // устанавливаем координаты новой полигональной сетки
+    // Устанавливаем позицию кубика в сцене
     mesh.position.set(x, y, z);
-    // добавляем сетку-коробку в сцену
+    // Добавляем кубик в сцену
     scene.add(mesh);
 
-    // применяем физику CannonJS
-    // создаём новый виртуальный блок, который совпадает с отрисованной на предыдущем этапе
-    const shape = new CANNON.Box(
-        new CANNON.Vec3(width / 2, boxHeight / 2, depth / 2)
-    );
-    // смотрим по входным параметрам, падает такой блок или нет
+    // Создаем физическую модель кубика с использованием CannonJS
+    const shape = new CANNON.Box(new CANNON.Vec3(width / 2, boxHeight / 2, depth / 2));
+    // Определяем массу кубика: если он должен падать, масса больше 0, иначе 0
     let mass = falls ? 5 : 0;
-    // уменьшаем массу блока пропорционально его размерам
-    mass *= width / originalBoxSize;
-    mass *= depth / originalBoxSize;
-    // создаём новую фигуру на основе блока
+    // Масса пропорциональна размерам кубика
+    mass *= (width / originalBoxSize) * (depth / originalBoxSize);
+    // Создаем физическое тело для кубика
     const body = new CANNON.Body({ mass, shape });
-    // помещаем его в нужное место
+    // Устанавливаем его позицию в физическом мире
     body.position.set(x, y, z);
-    // добавляем фигуру в физический мир
+    // Добавляем физическое тело в мир CannonJS
     world.addBody(body);
 
-    // возвращаем полигональные сетки и физические объекты, которые у нас получились после создания нового игрового блока
-    return {
-        threejs: mesh,
-        cannonjs: body,
-        width,
-        depth
-    };
+    // Возвращаем объект, содержащий как полигональную сетку (для визуализации), так и физическое тело (для симуляции)
+    return { threejs: mesh, cannonjs: body, width, depth };
 }
 
-// рисуем отрезанную часть блока
+// Функция для добавления свеса, который будет падать с пирамиды
 function addOverhang(x, z, width, depth) {
-    // получаем высоту, на которой будем работать
+    // Рассчитываем высоту свеса (обрезанной части), которая совпадает с предыдущим верхним слоем
     const y = boxHeight * (stack.length - 1);
-    // создаём новую фигуру, которая вышла за свес
+    // Создаем новую часть, которая упадет с пирамиды
     const overhang = generateBox(x, y, z, width, depth, true);
-    // добавляем её в свой массив
+    // Добавляем эту часть в массив overhangs
     overhangs.push(overhang);
 }
 
 
-// обрезаем игровой блок
+// Функция для обрезки верхнего блока и создания нового блока
 function cutBox(topLayer, overlap, size, delta) {
-    // получаем направление движения
+    // Определяем направление движения текущего верхнего блока
     const direction = topLayer.direction;
-    // и новую ширину и глубину
-    const newWidth = direction == "x" ? overlap : topLayer.width;
-    const newDepth = direction == "z" ? overlap : topLayer.depth;
+    // Рассчитываем новые размеры верхнего блока после обрезки
+    const newWidth = direction === "x" ? overlap : topLayer.width;
+    const newDepth = direction === "z" ? overlap : topLayer.depth;
 
-    // обновляем параметры верхнего блока
+    // Обновляем размеры верхнего блока в массиве stack
     topLayer.width = newWidth;
     topLayer.depth = newDepth;
 
-    // обновляем верхний блок в ThreeJS
+
+    let soundCabinList = ['1.mp3', '3.mp3', '4.mp3', '5.mp3'];
+    // Генерация случайного индекса
+    let randomIndexsoundCabin = Math.floor(Math.random() * soundCabinList.length);
+
+// Выбор случайного элемента
+    let randomsoundCabin = soundCabinList[randomIndexsoundCabin];
+    playSound("sound/cabin/"+randomsoundCabin);
+
+    // Обновляем размеры и позицию блока в сцене ThreeJS
     topLayer.threejs.scale[direction] = overlap / size;
     topLayer.threejs.position[direction] -= delta / 2;
 
-    // обновляем верхний блок в CannonJS
+    // Обновляем физическое тело в CannonJS, чтобы оно соответствовало новым размерам блока
     topLayer.cannonjs.position[direction] -= delta / 2;
-
-    // заменяем верхний блок меньшим, обрезанным блоком
-    const shape = new CANNON.Box(
-        new CANNON.Vec3(newWidth / 2, boxHeight / 2, newDepth / 2)
-    );
-    // добавляем обрезанную часть фигуры в физическую модель сцены
+    const shape = new CANNON.Box(new CANNON.Vec3(newWidth / 2, boxHeight / 2, newDepth / 2));
     topLayer.cannonjs.shapes = [];
     topLayer.cannonjs.addShape(shape);
 }
 
-// подготавливаемся к запуску и показываем демку на автопилоте
-init();
 
-// подготовка игры к запуску
+// Функция для инициализации игры и отображения демонстрации на автопилоте
 function init() {
-    // включаем автопилот
-    autopilot = true;
-    // игра не закончилась
-    gameEnded = false;
-    // анимации ещё не было
-    lastTime = 0;
-    // в пирамиде и в обрезках ничего нет
-    stack = [];
-    overhangs = [];
-    // задаём точность игры на автопилое
-    robotPrecision = Math.random() * 1 - 0.1;
+    autopilot = true; // Включаем автопилот для демонстрационного режима
+    gameEnded = false; // Игра еще не закончена
+    lastTime = 0; // Обнуляем время последней анимации
+    stack = []; // Очищаем массив слоев пирамиды
+    overhangs = []; // Очищаем массив падающих частей
+    robotPrecision = Math.random() * 1 - 0.1; // Задаем точность игры на автопилоте
 
-    // запускаем движок CannonJS
+    // Настраиваем физический мир CannonJS
     world = new CANNON.World();
-    // формируем гравитацию
-    world.gravity.set(0, -10, 0);
-    // включаем алгоритм, который находит сталкивающиеся объекты
-    world.broadphase = new CANNON.NaiveBroadphase();
-    // точность работы физики (по умолчанию — 10)
-    world.solver.iterations = 40;
+    world.gravity.set(0, -10, 0); // Устанавливаем гравитацию вниз
+    world.broadphase = new CANNON.NaiveBroadphase(); // Алгоритм для обработки столкновений
+    world.solver.iterations = 40; // Увеличиваем количество итераций для повышения точности симуляции
 
-    // высчитываем соотношения высоты и ширины, чтобы пирамида выглядела пропорционально окну браузера
+    // Настраиваем камеру и сцену в ThreeJS
     const aspect = window.innerWidth / window.innerHeight;
     const width = 7;
     const height = width / aspect;
 
-    // Включаем ThreeJs и добавляем камеру, от лица которой мы будем смотреть на пирамиду
-    camera = new THREE.OrthographicCamera(
-        width / -2,
-        width / 2,
-        height / 2,
-        height / -2,
-        0,
-        100
-    );
+    // Камера будет ортографической (без перспективы)
+    camera = new THREE.OrthographicCamera(width / -2, width / 2, height / 2, height / -2, 0, 100);
+    camera.position.set(4, 4, 4); // Устанавливаем позицию камеры
+    camera.lookAt(0, 0, 0); // Камера смотрит на центр сцены
 
-    // устанавливаем камеру в нужную точку и говорим, что она смотрит точно на центр сцены
-    camera.position.set(4, 4, 4);
-    camera.lookAt(0, 0, 0);
-
-    // создаём новую сцену
+    // Создаем сцену и задаем фон
     scene = new THREE.Scene();
     scene.background = null;
 
-    // основание пирамиды
+    // Добавляем первый слой пирамиды (основание)
     addLayer(0, 0, originalBoxSize, originalBoxSize);
-
-    // первый слой
+    // Добавляем второй слой пирамиды, который будет двигаться
     addLayer(-10, 0, originalBoxSize, originalBoxSize, "x");
 
-    // Настраиваем свет в сцене
-    // фоновая подсветка
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    // Настраиваем освещение в сцене
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6); // Фоновое освещение
     scene.add(ambientLight);
-    // прямой свет на пирамиду
-    const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+
+    const dirLight = new THREE.DirectionalLight(0xffffff, 0.8); // Направленный свет
     dirLight.position.set(10, 20, 0);
     scene.add(dirLight);
 
-    // настройки рендера
+    // Настраиваем рендерер для отрисовки сцены
     renderer = new THREE.WebGLRenderer({ antialias: false, alpha: true });
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setAnimationLoop(animation);
-    //renderer.setClearColor(new THREE.Color(0xc8b1ed), 0.9);
-    // добавляем на страницу отрендеренную сцену
-    document.body.appendChild(renderer.domElement);
-    renderer.render(scene, camera);
-
+    renderer.setAnimationLoop(animation); // Устанавливаем функцию анимации для рендера
+    document.body.appendChild(renderer.domElement); // Добавляем рендер на страницу
+    renderer.render(scene, camera); // Отрисовываем сцену с текущими настройками
 }
 
-// запуск игры
+// Функция для запуска игры (сброс всех настроек и перезапуск)
 function startGame() {
-    // выключаем автопилот
-    autopilot = false;
-    // сбрасываем все настройки
-    gameEnded = false;
-    lastTime = 0;
-    stack = [];
-    overhangs = [];
+    autopilot = false; // Выключаем автопилот
+    gameEnded = false; // Сбрасываем флаг конца игры
+    lastTime = 0; // Обнуляем время последней анимации
+    stack = []; // Очищаем массив слоев пирамиды
+    overhangs = []; // Очищаем массив падающих частей
 
-    // если на экране есть инструкции или результат — скрываем их
+    // Если на экране есть инструкции или результаты — скрываем их
     if (instructionsElement) instructionsElement.style.display = "none";
     if (resultsElement) resultsElement.style.display = "none";
-    // если видны очки — обнуляем их
-    if (scoreElement) scoreElement.innerText = 0;
+    if (scoreElement) scoreElement.innerText = 0; // Сбрасываем счетчик очков
 
-    // если физический мир уже создан — убираем из него все объекты
+    // Удаляем все объекты из физического мира
     if (world) {
         while (world.bodies.length > 0) {
             world.remove(world.bodies[0]);
         }
     }
 
-    // если сцена уже есть, тоже убираем из неё всё, что было
+    // Удаляем все объекты из сцены
     if (scene) {
-        while (scene.children.find((c) => c.type == "Mesh")) {
-            const mesh = scene.children.find((c) => c.type == "Mesh");
+        while (scene.children.find((c) => c.type === "Mesh")) {
+            const mesh = scene.children.find((c) => c.type === "Mesh");
             scene.remove(mesh);
         }
 
-        // добавляем основание
+        // Добавляем основание и первый движущийся слой
         addLayer(0, 0, originalBoxSize, originalBoxSize);
-
-        // и первый слой
         addLayer(-10, 0, originalBoxSize, originalBoxSize, "x");
     }
 
-    // если уже есть камера — сбрасываем её настройки
+    // Сбрасываем позицию камеры
     if (camera) {
         camera.position.set(4, 4, 4);
         camera.lookAt(0, 0, 0);
@@ -247,48 +227,12 @@ function startGame() {
 
 
 
-
-
-// отслеживаем нажатия на клавиши и мышь
-//window.addEventListener("mousedown", eventHandler);
-
-window.addEventListener("touchstart", eventHandler);
-btn_start.addEventListener("touchstart", function (event) {
-    event.preventDefault();
-    // запускаем игру
-    startGame();
-    is_started = true;
-    canHandleEvent = false;
-
-    setTimeout(() => {
-        canHandleEvent = true;
-    }, startDelay);
-    // выходим из обработчика
-    return;
-});
-btn_again.addEventListener("touchstart", function (event) {
-    event.preventDefault();
-    // запускаем игру
-    startGame();
-    is_started = true;
-    canHandleEvent = false;
-
-    setTimeout(() => {
-        canHandleEvent = true;
-    }, startDelay);
-    // выходим из обработчика
-    return;
-});
-
-
-
-// своя оббраотка нажатия пробела
+// Обработчик событий для отслеживания кликов или касаний экрана
 function eventHandler() {
-    if (!is_started  || !canHandleEvent) return;
-    // если включено демо — запускаем игру
-    if (autopilot) startGame();
-    // иначе обрезаем блок как есть и запускаем следующий
-    else splitBlockAndAddNextOneIfOverlaps();
+    if (!is_started || !canHandleEvent) return; // Если игра не начата или обработка событий не разрешена, выходим
+
+    if (autopilot) startGame(); // Если включен автопилот, перезапускаем игру
+    else splitBlockAndAddNextOneIfOverlaps(); // Иначе обрезаем блок и добавляем новый
 }
 
 // обрезаем блок как есть и запускаем следующий
@@ -322,15 +266,6 @@ function splitBlockAndAddNextOneIfOverlaps() {
             correctTaps = 0;
             // отрезаем
             cutBox(topLayer, overlap, size, delta);
-
-            const soundСabinList = ['1.mp3', '3.mp3', '4.mp3', '5.mp3'];
-            // Генерация случайного индекса
-            const randomIndexsoundСabin = Math.floor(Math.random() * soundСabinList.length);
-
-// Выбор случайного элемента
-            const randomsoundСabin = soundСabinList[randomIndexsoundСabin];
-            console.log(randomsoundСabin)
-            playSound(randomsoundСabin);
 
             // считаем размер свеса
             const overhangShift = (overlap / 2 + overhangSize / 2) * Math.sign(delta);
@@ -380,10 +315,8 @@ function splitBlockAndAddNextOneIfOverlaps() {
             topLayer.cannonjs.velocity.set(0, 0, 0);
             topLayer.cannonjs.angularVelocity.set(0, 0, 0);
 
-
-
             // Трижды моргаем цветом при постановке блока
-            flashColorWithVibrationAndSound(topLayer.threejs, 0xFFFFDD, '2181b19773767a7.mp3'); // Меняем цвет на желтый
+            flashColorWithVibrationAndSound(topLayer.threejs, 0xFFFFDD, 'sound/perfectTap/2181b19773767a7.mp3'); // Меняем цвет на желтый
 
             // Проверяем, если 5 правильных тапов подряд
             if (correctTaps === 5) {
@@ -456,10 +389,14 @@ function flashColorWithVibrationAndSound(block, newColor, soundFile, duration = 
             const isOriginalColor = currentTime % 2 === 0;
             block.material.color.setHex(isOriginalColor ? newColor : originalColor);
 
-            // Если это первый раз, добавляем вибрацию
-            if (currentTime === 0 && navigator.vibrate) {
-                navigator.vibrate([100, 100, 100]); // Вибрация на 200 мс, пауза 100 мс, затем снова вибрация 200 мс
+            if (isMobileDevice())
+            {
+                // Если это первый раз, добавляем вибрацию
+                if (currentTime === 0 && navigator.vibrate) {
+                    navigator.vibrate([100, 100, 100]); // Вибрация на 200 мс, пауза 100 мс, затем снова вибрация 200 мс
+                }
             }
+
 
             // Запускаем следующий цикл через указанное время
             setTimeout(() => toggleColor(currentTime + 1), duration);
@@ -563,6 +500,89 @@ function updatePhysics(timePassed) {
         element.threejs.quaternion.copy(element.cannonjs.quaternion);
     });
 }
+
+function isMobileDevice() {
+    return /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
+
+function getRandomGradient() {
+    const randomIndex = Math.floor(Math.random() * gradients.length);
+    return gradients[randomIndex];
+}
+
+// подготавливаемся к запуску и показываем демку на автопилоте
+init();
+
+
+// если открыто на смартфоне то событие тач, если на компьютере то событие клик
+if (isMobileDevice()) {
+    window.addEventListener("touchstart", eventHandler);
+    btn_start.addEventListener("touchstart", function (event) {
+        event.preventDefault();
+        // запускаем игру
+        startGame();
+        is_started = true;
+        canHandleEvent = false;
+
+        setTimeout(() => {
+            canHandleEvent = true;
+        }, startDelay);
+        // выходим из обработчика
+        return;
+    });
+    btn_again.addEventListener("touchstart", function (event) {
+        event.preventDefault();
+        // запускаем игру
+        startGame();
+        is_started = true;
+        canHandleEvent = false;
+
+        setTimeout(() => {
+            canHandleEvent = true;
+        }, startDelay);
+        // выходим из обработчика
+        return;
+    });
+}
+else
+{
+    window.addEventListener("click", eventHandler);
+    btn_start.addEventListener("click", function (event) {
+        event.preventDefault();
+        // запускаем игру
+        startGame();
+        is_started = true;
+        canHandleEvent = false;
+
+        setTimeout(() => {
+            canHandleEvent = true;
+        }, startDelay);
+        // выходим из обработчика
+        return;
+    });
+    btn_again.addEventListener("click", function (event) {
+        event.preventDefault();
+        // запускаем игру
+        startGame();
+        is_started = true;
+        canHandleEvent = false;
+
+        setTimeout(() => {
+            canHandleEvent = true;
+        }, startDelay);
+        // выходим из обработчика
+        return;
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    const gradient = getRandomGradient();
+    const particlesElement = document.getElementById('particles-js');
+
+    if (particlesElement) {
+        particlesElement.style.background = `linear-gradient(to bottom, ${gradient.start}, ${gradient.end})`;
+    }
+});
 
 // обрабатываем изменение размеров окна
 window.addEventListener("resize", () => {

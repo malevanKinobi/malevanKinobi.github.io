@@ -57,7 +57,7 @@ body {
     width: 100%;
     /* затемняем фон */
     background-color: rgba(20, 20, 20, 0.75);
-} 
+}
 
 /* сообщение о конце игры не показываем на старте */
 #results {
@@ -75,12 +75,17 @@ body {
 #score {
     font-family: "Roboto", sans-serif;
     position: absolute;
-    color: #414141;
+    color: #f4f4f4;
     font-size: 110px;
     font-weight: bold;
     top: 10%;
     left: 50%;
     transform: translate(-50%, -50%);
+    text-shadow:
+            -1px -1px 0 #696969,
+            1px -1px 0 #696969,
+            -1px 1px 0 #696969,
+            1px 1px 0 #696969; /* Черный контур вокруг текста */
 }
 
 #btn_again, #btn_start
