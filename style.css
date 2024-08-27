@@ -30,6 +30,14 @@
     font-style: italic;
 }
 
+/* Жирный курсив */
+@font-face {
+    font-family: 'Cruinn';
+    src: url('fonts/cruinn/cruinn.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
 
 /* общие настройки страницы */
 body {
@@ -56,7 +64,7 @@ body {
     height: 100%;
     width: 100%;
     /* затемняем фон */
-    background-color: rgba(20, 20, 20, 0.75);
+    background-color: rgba(20, 20, 20, 0.4);
 }
 
 /* сообщение о конце игры не показываем на старте */
@@ -71,22 +79,44 @@ body {
     margin: 0 auto;
 }
 
-/* настройка вывода набранных очков в правом верхнем углу */
 #score {
-    font-family: "Roboto", sans-serif;
+    font-family: "Cruinn", sans-serif;
     position: absolute;
-    color: #f4f4f4;
-    font-size: 90px;
+    color: #ffffff;
+    font-size: 150px;
     font-weight: bold;
-    top: 10%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    text-shadow:
-            -1px -1px 0 #696969,
-            1px -1px 0 #696969,
-            -1px 1px 0 #696969,
-            1px 1px 0 #696969; /* Черный контур вокруг текста */
+    padding: 0;
+    margin: 0;
+    top: 10%; /* Оставляем отступ сверху на 10% */
+    left: 50%; /* Центрируем по горизонтали */
+    background-color: rgba(0, 0, 0, 0.2); /* Прозрачный черный фон */
+    width: 200px;
+    height: 200px;
+    text-align: center;
+    line-height: 200px;
+    transform: translate(-50%, -50%); /* Центрируем по вертикали и горизонтали */
+    backdrop-filter: blur(100px); /* Размытие фона */
+    border-radius: 30px; /* Закругление углов, если нужно */
+    overflow: hidden; /* Обрезка контента, выходящего за границы */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-indent: 15px; /* Сдвигаем текст влево на 5 пикселей */
 }
+
+
+#score::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -50px; /* Размытие на 50px слева */
+    right: -50px; /* Размытие на 50px справа */
+    bottom: 0;
+    background: inherit; /* Наследуем фон, чтобы применить размытие к краям */
+    filter: blur(50px); /* Степень размытия */
+    z-index: -1; /* Размытие за основным контентом */
+}
+
 
 #btn_again, #btn_start
 {
@@ -104,3 +134,14 @@ body {
     border-radius: 10px;
 }
 
+#blurOverlay {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 800px; /* Высота размытия */
+    pointer-events: none; /* Элемент не будет перехватывать клики */
+    background: linear-gradient(to top, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0));
+    z-index: 1000; /* Поверх всех элементов */
+}

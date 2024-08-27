@@ -32,6 +32,7 @@ let towerGroup;
 const scoreElement = document.getElementById("score");
 const instructionsElement = document.getElementById("instructions");
 const resultsElement = document.getElementById("results");
+const blurOverlay = document.getElementById("blurOverlay");
 
 // Кнопки для управления стартом и перезапуском игры
 const btn_start = document.getElementById("btn_start");
@@ -39,8 +40,8 @@ const btn_again = document.getElementById("btn_again");
 const particlesElement = document.getElementById('particles-js');
 
 const colorsList = [
-    // { gradients: {start: '#3AA6D0', end: '#FF8B73'}, block: 10 },
-    // { gradients: {start: '#6D48D7', end: '#35C0CD'}, block: 41 },
+    { gradients: {start: '#3AA6D0', end: '#FF8B73'}, block: 10 },
+    { gradients: {start: '#6D48D7', end: '#35C0CD'}, block: 41 },
     { gradients: {start: '#FF9D40', end: '#4869D6'}, block: 133 },
 ];
 
@@ -340,6 +341,8 @@ function handleStartButtonClick(event) {
     init(); // Инициализируем игру
     startGame(); // Запускаем игру
 
+    blurOverlay.style.display = "block";
+
     is_started = true;
     canHandleEvent = false;
 
@@ -353,7 +356,7 @@ function handleStartButtonClick(event) {
 function handleAgainButtonClick(event) {
     event.preventDefault();
     startGame(); // Перезапускаем игру
-
+    blurOverlay.style.display = "block";
     // Выбираем новый цвет из списка при перезапуске игры
     colors = getRandomColorGradient(colorsList);
     updateBackgroundGradient(colors.gradients.start, colors.gradients.end);
@@ -603,6 +606,8 @@ function handlePerfectTap(topLayer, previousLayer, direction) {
 
 // Функция для обработки ситуации, когда игрок промахнулся
 function missedTheSpot() {
+    blurOverlay.style.display = "none";
+
     removeLastBlock(); // Удаляем последний добавленный блок
 
     if (stack.length > 0) {
