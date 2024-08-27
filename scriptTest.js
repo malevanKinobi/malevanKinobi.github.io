@@ -511,7 +511,7 @@ function calculateCameraDistance(totalHeight) {
     if (totalHeight <= 2) {
         distance *= 12;
     } else if (totalHeight <= 10) {
-        distance *= 5;
+        distance *= 4;
     } else {
         distance *= 1.1;
     }
