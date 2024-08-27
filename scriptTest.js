@@ -215,7 +215,7 @@ function cutBox(topLayer, overlap, size, delta) {
     let soundCabinList = ['1.mp3', '3.mp3', '4.mp3', '5.mp3'];
     // Генерация случайного индекса
     let randomIndexSoundCabin = Math.floor(Math.random() * soundCabinList.length);
- 
+
     // Выбор случайного элемента
     let randomSoundCabin = soundCabinList[randomIndexSoundCabin];
     // Проигрывание звука рубки
