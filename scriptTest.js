@@ -39,17 +39,10 @@ const btn_again = document.getElementById("btn_again");
 const particlesElement = document.getElementById('particles-js');
 
 const colorsList = [
-    { gradients: {start: '#3AA6D0', end: '#FF8B73'}, block: 10 },
-    { gradients: {start: '#EE3C7E', end: '#E3FC3F'}, block: 263 },
-    { gradients: {start: '#6D48D7', end: '#35C0CD'}, block: 41 },
+    // { gradients: {start: '#3AA6D0', end: '#FF8B73'}, block: 10 },
+    // { gradients: {start: '#6D48D7', end: '#35C0CD'}, block: 41 },
+    { gradients: {start: '#FF9D40', end: '#4869D6'}, block: 133 },
 ];
-
-let colors = getRandomColorGradient(colorsList);
-
-if (particlesElement) {
-    particlesElement.style.background = `linear-gradient(to bottom, ${colors.gradients.start}, ${colors.gradients.end})`;
-}
-
 
 // Инициализация игры и настройка всех параметров
 function init() {
@@ -59,6 +52,12 @@ function init() {
     stack = []; // Очищаем массив слоев пирамиды
     overhangs = []; // Очищаем массив обрезанных частей пирамиды
     robotPrecision = Math.random() * 1 - 0.1; // Генерируем точность автопилота
+
+    // Выбор нового цвета при каждом старте
+    colors = getRandomColorGradient(colorsList);
+
+    // Устанавливаем исходный градиент фона при старте игры
+    setInitialBackgroundGradient();
 
     // Инициализация физического мира
     initPhysicsWorld();
@@ -108,12 +107,46 @@ function initScene() {
     document.body.appendChild(renderer.domElement); // Добавляем рендерер на страницу
 }
 
-// Функция для добавления нового слоя к пирамиде
+// Функция для установки исходного цвета фона
+function setInitialBackgroundGradient() {
+    const startColor = colors.gradients.start; // Исходный цвет для верхней части градиента
+    const endColor = colors.gradients.end; // Исходный цвет для нижней части градиента
+
+    if (particlesElement) {
+        particlesElement.style.background = `linear-gradient(to bottom, ${startColor}, ${endColor})`; // Устанавливаем исходный градиент
+    }
+}
+
+// Функция для изменения оттенка цвета
+function shiftHue(color, factor) {
+    const hsl = new THREE.Color(color).getHSL({});
+    hsl.h = (hsl.h + factor / 360) % 1; // Смещение оттенка
+    return new THREE.Color().setHSL(hsl.h, hsl.s, hsl.l).getStyle();
+}
+
+// Функция для обновления цвета фона на основе текущей высоты башни
+function updateBackgroundGradient() {
+    const heightFactor = stack.length * 5; // Фактор, влияющий на изменение цвета
+
+    // Вычисляем текущие оттенки на основе начальных цветов
+    const startColor = shiftHue(colors.gradients.start, heightFactor);
+    const endColor = shiftHue(colors.gradients.end, heightFactor);
+
+    if (particlesElement) {
+        particlesElement.style.background = `linear-gradient(to bottom, ${startColor}, ${endColor})`; // Применяем новый градиент к фону
+    }
+}
+// Функция для добавления нового слоя к пирамиде и обновления градиента фона
 function addLayer(x, z, width, depth, direction) {
     const y = boxHeight * stack.length;
     const layer = generateBox(x, y, z, width, depth, false);
     layer.direction = direction;
     stack.push(layer);
+
+    // Обновляем градиент фона после первого добавления нового слоя
+    if (stack.length > 1) {
+        updateBackgroundGradient();
+    }
 }
 
 // Добавляем первый слой пирамиды (основание) и второй движущийся слой
@@ -123,7 +156,7 @@ function addInitialLayers() {
 }
 
 
-// Функция для запуска игры (сброс всех настроек и перезапуск)
+// Перезапуск игры с обновлением цвета
 function startGame() {
     stopRotation(); // Останавливаем вращение башни
 
@@ -321,6 +354,10 @@ function handleAgainButtonClick(event) {
     event.preventDefault();
     startGame(); // Перезапускаем игру
 
+    // Выбираем новый цвет из списка при перезапуске игры
+    colors = getRandomColorGradient(colorsList);
+    updateBackgroundGradient(colors.gradients.start, colors.gradients.end);
+
     is_started = true;
     canHandleEvent = false;
 
@@ -399,8 +436,8 @@ function generateBox(x, y, z, width, depth, falls) {
     const color = new THREE.Color(`hsl(${colors.block + stack.length * 10}, 50%, 50%)`);
     const material = new THREE.MeshLambertMaterial({ color });
     const mesh = new THREE.Mesh(geometry, material);
-    mesh.position.set(x, y, z);
 
+    mesh.position.set(x, y, z);
     scene.add(mesh);
     towerGroup.add(mesh);
 
@@ -413,7 +450,6 @@ function generateBox(x, y, z, width, depth, falls) {
 
     return { threejs: mesh, cannonjs: body, width, depth };
 }
-
 // Функция для обновления физики в игре
 function updatePhysics(timePassed) {
     // Настраиваем длительность событий
