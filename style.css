@@ -78,20 +78,20 @@ body {
 #instructions .content {
     margin: 0 auto;
 }
- 
+
 #score {
     font-family: "Cruinn", sans-serif;
     position: absolute;
     color: #ffffff;
-    font-size: 150px;
+    font-size: 100px;
     font-weight: bold;
     padding: 0;
     margin: 0;
     top: 10%; /* Оставляем отступ сверху на 10% */
     left: 50%; /* Центрируем по горизонтали */
     background-color: rgba(0, 0, 0, 0.2); /* Прозрачный черный фон */
-    width: 200px;
-    height: 200px;
+    width: 150px;
+    height: 150px;
     text-align: center;
     line-height: 200px;
     transform: translate(-50%, -50%); /* Центрируем по вертикали и горизонтали */
