@@ -83,15 +83,15 @@ body {
     font-family: "Cruinn", sans-serif;
     position: absolute;
     color: #ffffff;
-    font-size: 80px;
-    font-weight: bold; 
+    font-size: 60px;
+    font-weight: bold;
     padding: 0;
     margin: 0;
     top: 10%; /* Оставляем отступ сверху на 10% */
     left: 50%; /* Центрируем по горизонтали */
     background-color: rgba(0, 0, 0, 0.2); /* Прозрачный черный фон */
-    width: 120px;
-    height: 120px;
+    width: 100px;
+    height: 100px;
     text-align: center;
     line-height: 200px;
     transform: translate(-50%, -50%); /* Центрируем по вертикали и горизонтали */
@@ -101,7 +101,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    text-indent: 15px; /* Сдвигаем текст влево на 5 пикселей */
+    text-indent: 10px; /* Сдвигаем текст влево на 5 пикселей */
 }
 
 
