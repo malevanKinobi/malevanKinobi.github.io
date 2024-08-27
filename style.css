@@ -101,7 +101,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    text-indent: 10px; /* Сдвигаем текст влево на 5 пикселей */
+    text-indent: 9px; /* Сдвигаем текст влево на 5 пикселей */
 }
 
 
