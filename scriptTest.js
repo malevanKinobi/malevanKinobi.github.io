@@ -503,7 +503,7 @@ function showFullPyramid() {
     // Запускаем вращение башни
     rotateTower();
 }
- 
+
 // Функция для расчета расстояния до камеры на основе высоты башни
 function calculateCameraDistance(totalHeight) {
     let distance = totalHeight; // Множитель для отдаления камеры
