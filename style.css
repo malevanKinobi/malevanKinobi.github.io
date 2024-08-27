@@ -84,7 +84,7 @@ body {
     position: absolute;
     color: #ffffff;
     font-size: 80px;
-    font-weight: bold;
+    font-weight: bold; 
     padding: 0;
     margin: 0;
     top: 10%; /* Оставляем отступ сверху на 10% */
