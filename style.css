@@ -80,11 +80,10 @@ body {
 }
 
 #score {
-    font-family: "Cruinn", sans-serif;
+    font-family: "Courier New", sans-serif;
     position: absolute;
     color: #ffffff;
     font-size: 60px;
-    font-weight: bold;
     padding: 0;
     margin: 0;
     top: 10%; /* Оставляем отступ сверху на 10% */
@@ -93,7 +92,7 @@ body {
     width: 100px;
     height: 100px;
     text-align: center;
-    line-height: 200px;
+    line-height: 1.6;
     transform: translate(-50%, -50%); /* Центрируем по вертикали и горизонтали */
     backdrop-filter: blur(100px); /* Размытие фона */
     border-radius: 30px; /* Закругление углов, если нужно */
@@ -101,7 +100,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    text-indent: 7px; /* Сдвигаем текст влево на 5 пикселей */
+     /* Сдвигаем текст влево на 5 пикселей */
 }
 
 
