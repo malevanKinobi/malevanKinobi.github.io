@@ -158,8 +158,8 @@ function addLayer(x, z, width, depth, direction) {
 // Функция для добавления первого слоя пирамиды (основания) и второго движущегося слоя
 function addInitialLayers() {
     // Добавляем основание под первый блок
-    const baseWidth = originalBoxSize * 1; // Ширина основания больше, чем у блоков пирамиды
-    const baseDepth = originalBoxSize * 1; // Глубина основания больше, чем у блоков пирамиды
+    const baseWidth = originalBoxSize; // Ширина основания больше, чем у блоков пирамиды
+    const baseDepth = originalBoxSize; // Глубина основания больше, чем у блоков пирамиды
     generateBox(0, -baseHeight / 1.9809, 0, baseWidth, baseDepth, false, true); // Позиция основания с учетом высоты
 
     // Первый слой — основание пирамиды

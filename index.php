@@ -32,7 +32,9 @@
     </div>
 </div>
 <!-- блок с очками -->
-
+<?php
+    print_r($_GET)
+?>
 <div id="score">0</div>
 
 <div class="container-for-word">
