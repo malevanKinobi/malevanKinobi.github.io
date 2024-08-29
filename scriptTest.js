@@ -47,7 +47,7 @@ const colorsList = [
 ];
 
 let colors;
-
+ 
 
 // Инициализация игры и настройка всех параметров
 function init() {
