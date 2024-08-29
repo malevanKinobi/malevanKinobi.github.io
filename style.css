@@ -124,6 +124,35 @@ button, input {
     z-index: -1; /* Размытие за основным контентом */
 }
 
+.container-for-word
+{
+    
+    width: 80%;
+    margin: 0 auto;
+    position: relative;
+    top: 190px;
+}
+
+.row
+{
+    display: flex;
+    justify-content: space-between;
+}
+
+.letter
+{
+    font-family: "Courier New", sans-serif;
+    font-size: 50px;
+    font-weight: bold;
+    color: #ffffff;
+
+    background-color: rgba(0, 0, 0, 0.2); /* Прозрачный черный фон */
+    border-radius: 20%;
+    padding: 10px;
+    backdrop-filter: blur(100px); /* Размытие фона */
+    text-transform: capitalize;
+}
+
 
 /* Стиль для кнопок */
 #btn_again, #btn_start {
@@ -174,3 +203,4 @@ button, input {
     background: linear-gradient(to top, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0));
     z-index: 1000; /* Поверх всех элементов */
 }
+
