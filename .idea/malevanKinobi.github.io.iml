@@ -5,8 +5,10 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="cannon.js" level="application" />
-    <orderEntry type="library" name="particles" level="application" />
     <orderEntry type="library" name="three.js" level="application" />
+    <orderEntry type="library" name="howler" level="application" />
+    <orderEntry type="library" name="particles" level="application" />
     <orderEntry type="library" name="stats.js" level="application" />
+    <orderEntry type="library" name="tween.js" level="application" />
   </component>
 </module>

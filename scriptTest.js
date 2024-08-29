@@ -17,17 +17,18 @@ const boxHeight = 1;
 const originalBoxSize = 3;
 // задаём скорость движения
 let speed = 0.008;
-
+const baseHeight = 100; // Высота основания, например, 2 единицы
 // Переменные для управления игровым процессом и его состоянием
 let autopilot; // Флаг для управления режимом автопилота (демонстрационного режима)
 let gameEnded; // Флаг для отслеживания конца игры
 let robotPrecision; // Переменная для хранения точности автопилота
 let is_started = false; // Флаг для отслеживания состояния старта игры
-let startDelay = 500; // Задержка перед началом обработки событий после старта игры
+let startDelay = 100; // Задержка перед началом обработки событий после старта игры
 let canHandleEvent = false; // Флаг для разрешения обработки событий
 let correctTaps = 0; // Счетчик правильных нажатий
 let animationFrameId;
 let towerGroup;
+let blockColor;
 // Получаем доступ к элементам на странице, связанным с очками, инструкциями и результатами
 const scoreElement = document.getElementById("score");
 const instructionsElement = document.getElementById("instructions");
@@ -45,8 +46,12 @@ const colorsList = [
     { gradients: {start: '#FF9D40', end: '#4869D6'}, block: 133 },
 ];
 
+let colors;
+
+
 // Инициализация игры и настройка всех параметров
 function init() {
+    blurOverlay.style.display = "block";
     autopilot = false; // Отключаем автопилот
     gameEnded = false; // Игра не закончена
     lastTime = 0; // Сбрасываем время последнего кадра
@@ -150,15 +155,25 @@ function addLayer(x, z, width, depth, direction) {
     }
 }
 
-// Добавляем первый слой пирамиды (основание) и второй движущийся слой
+// Функция для добавления первого слоя пирамиды (основания) и второго движущегося слоя
 function addInitialLayers() {
-    addLayer(0, 0, originalBoxSize, originalBoxSize); // Первый слой — основание
-    addLayer(-10, 0, originalBoxSize, originalBoxSize, "x"); // Второй слой — движущийся
+    // Добавляем основание под первый блок
+    const baseWidth = originalBoxSize * 1.5; // Ширина основания больше, чем у блоков пирамиды
+    const baseDepth = originalBoxSize * 1.5; // Глубина основания больше, чем у блоков пирамиды
+    generateBox(0, -baseHeight / 1.98, 0, baseWidth, baseDepth, false, true); // Позиция основания с учетом высоты
+
+    // Первый слой — основание пирамиды
+    addLayer(0, 0, originalBoxSize, originalBoxSize);
+
+    // Второй слой — движущийся блок
+    addLayer(-10, 0, originalBoxSize, originalBoxSize, "x");
 }
+
 
 
 // Перезапуск игры с обновлением цвета
 function startGame() {
+
     stopRotation(); // Останавливаем вращение башни
 
     resetTowerGroup(); // Сбрасываем башню в исходное положение
@@ -296,9 +311,13 @@ function addOverhang(x, z, width, depth) {
 }
 
 // Функция для воспроизведения звука
-function playSound(soundFile) {
-    const audio = new Audio(soundFile);
-    audio.play();
+function playSound(soundFile, volume = 1) {
+    const cutSound = new Howl({
+        src: [soundFile],  // Укажите путь к вашему аудиофайлу
+        preload: true      // Предзагрузка звука
+    });
+    cutSound.volume(volume);
+    cutSound.play();
 }
 
 
@@ -338,10 +357,11 @@ function setupEventHandlers() {
 // Обработчик нажатия на кнопку старта игры
 function handleStartButtonClick(event) {
     event.preventDefault();
-    init(); // Инициализируем игру
+    playSound("sound/cabin/1.mp3", 0);
+
     startGame(); // Запускаем игру
 
-    blurOverlay.style.display = "block";
+
 
     is_started = true;
     canHandleEvent = false;
@@ -355,10 +375,11 @@ function handleStartButtonClick(event) {
 // Обработчик нажатия на кнопку перезапуска игры
 function handleAgainButtonClick(event) {
     event.preventDefault();
+    colors = getRandomColorGradient(colorsList);
     startGame(); // Перезапускаем игру
     blurOverlay.style.display = "block";
     // Выбираем новый цвет из списка при перезапуске игры
-    colors = getRandomColorGradient(colorsList);
+
     updateBackgroundGradient(colors.gradients.start, colors.gradients.end);
 
     is_started = true;
@@ -413,14 +434,24 @@ function updateTopLayer(timePassed) {
         return;
     }
 
-    const boxShouldMove = !gameEnded &&
+    const boxShouldMove = !gameEnded && is_started &&
         (!autopilot || (autopilot && topLayer.threejs.position[topLayer.direction] <
             previousLayer.threejs.position[topLayer.direction] + robotPrecision));
 
     if (boxShouldMove) {
-        if (topLayer.threejs.position[topLayer.direction] > 10 || topLayer.threejs.position[topLayer.direction] < -10) {
-            speed *= -1;
+        // Ограничиваем движение блока в пределах, например, от -10 до 10
+        const boundary = 5;
+
+        // Если блок выходит за границы, меняем направление движения
+        if (topLayer.threejs.position[topLayer.direction] >= boundary) {
+            topLayer.threejs.position[topLayer.direction] = boundary; // Ограничиваем движение до границы
+            speed *= -1; // Меняем направление
+        } else if (topLayer.threejs.position[topLayer.direction] <= -boundary) {
+            topLayer.threejs.position[topLayer.direction] = -boundary; // Ограничиваем движение до границы
+            speed *= -1; // Меняем направление
         }
+
+        // Двигаем блок
         topLayer.threejs.position[topLayer.direction] += speed * timePassed;
         topLayer.cannonjs.position[topLayer.direction] += speed * timePassed;
     }
@@ -434,9 +465,11 @@ function updateCameraPosition(timePassed) {
 }
 
 // Функция для создания и добавления игрового блока (кубика) на сцену
-function generateBox(x, y, z, width, depth, falls) {
-    const geometry = new THREE.BoxGeometry(width, boxHeight, depth);
-    const color = new THREE.Color(`hsl(${colors.block + stack.length * 10}, 50%, 50%)`);
+function generateBox(x, y, z, width, depth, falls, isBase = false) {
+    const height = isBase ? baseHeight : boxHeight; // Используем высоту основания или стандартную высоту блока
+    const geometry = new THREE.BoxGeometry(width, height, depth);
+    const color = isBase ? new THREE.Color(`hsl(${colors.block + stack.length * 5}, 70%, 70%)`) : new THREE.Color(`hsl(${colors.block + stack.length * 5}, 50%, 50%)`); // Цвет основания — коричневый, блоки — разные цвета
+    console.log(colors.block + stack.length * 5)
     const material = new THREE.MeshLambertMaterial({ color });
     const mesh = new THREE.Mesh(geometry, material);
 
@@ -444,7 +477,7 @@ function generateBox(x, y, z, width, depth, falls) {
     scene.add(mesh);
     towerGroup.add(mesh);
 
-    const shape = new CANNON.Box(new CANNON.Vec3(width / 2, boxHeight / 2, depth / 2));
+    const shape = new CANNON.Box(new CANNON.Vec3(width / 2, height / 2, depth / 2));
     let mass = falls ? 5 : 0;
     mass *= (width / originalBoxSize) * (depth / originalBoxSize);
     const body = new CANNON.Body({ mass, shape });
@@ -596,7 +629,7 @@ function handlePerfectTap(topLayer, previousLayer, direction) {
 
     flashColorWithVibrationAndSound(topLayer.threejs, 0xFFFFDD, 'sound/perfectTap/2181b19773767a7.mp3');
 
-    if (correctTaps === 5) {
+    if (correctTaps === 1) {
         increaseBlockSize(topLayer, 1.1, originalBoxSize);
         correctTaps = 0;
     }
@@ -658,12 +691,20 @@ function removeLastBlock() {
 
 // Функция для увеличения размера блока на определенный множитель, но не больше указанного максимального размера
 function increaseBlockSize(block, scaleMultiplier, maxSize) {
+
     const newWidth = Math.min(block.width * scaleMultiplier, maxSize);
     const newDepth = Math.min(block.depth * scaleMultiplier, maxSize);
+
+    if (block.width < maxSize || block.depth < maxSize)
+    {
+        playSound("sound/plateMagnification.mp3");
+    }
 
     // Обновляем масштаб блока в Three.js
     block.threejs.scale.x = newWidth / block.width;
     block.threejs.scale.z = newDepth / block.depth;
+
+
 
     // Обновляем физическое тело в Cannon.js
     block.cannonjs.shapes.forEach(shape => {
@@ -685,6 +726,6 @@ function getRandomColorGradient(list) {
     const randomIndex = Math.floor(Math.random() * list.length); // Генерация случайного индекса в пределах длины списка
     return list[randomIndex]; // Возврат случайного объекта градиента
 }
-
+init(); // Инициализируем игру
 // Настраиваем обработчики событий при загрузке
 setupEventHandlers();
