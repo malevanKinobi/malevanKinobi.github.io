@@ -47,7 +47,7 @@ const colorsList = [
 ];
 
 let colors;
- 
+
 
 // Инициализация игры и настройка всех параметров
 function init() {
@@ -629,7 +629,7 @@ function handlePerfectTap(topLayer, previousLayer, direction) {
 
     flashColorWithVibrationAndSound(topLayer.threejs, 0xFFFFDD, 'sound/perfectTap/2181b19773767a7.mp3');
 
-    if (correctTaps === 1) {
+    if (correctTaps === 5) {
         increaseBlockSize(topLayer, 1.1, originalBoxSize);
         correctTaps = 0;
     }
