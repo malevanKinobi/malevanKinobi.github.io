@@ -33,7 +33,7 @@
 </div>
 <!-- блок с очками -->
 <?php
-    print_r($_GET);
+//    print_r($_GET);
 ?>
 <div id="score">0</div>
 
