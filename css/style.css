@@ -1,7 +1,7 @@
 /* Обычное начертание */
 @font-face {
     font-family: 'Roboto';
-    src: url('fonts/roboto/Roboto-Regular.ttf') format('truetype');
+    src: url('../fonts/roboto/Roboto-Regular.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 }
@@ -9,7 +9,7 @@
 /* Жирное начертание */
 @font-face {
     font-family: 'Roboto';
-    src: url('fonts/roboto/Roboto-Bold.ttf') format('truetype');
+    src: url('../fonts/roboto/Roboto-Bold.ttf') format('truetype');
     font-weight: bold;
     font-style: normal;
 }
@@ -17,7 +17,7 @@
 /* Курсив */
 @font-face {
     font-family: 'Roboto';
-    src: url('fonts/roboto/Roboto-Italic.ttf') format('truetype');
+    src: url('../fonts/roboto/Roboto-Italic.ttf') format('truetype');
     font-weight: normal;
     font-style: italic;
 }
@@ -25,7 +25,7 @@
 /* Жирный курсив */
 @font-face {
     font-family: 'Roboto';
-    src: url('fonts/roboto/Roboto-BoldItalic.ttf') format('truetype');
+    src: url('../fonts/roboto/Roboto-BoldItalic.ttf') format('truetype');
     font-weight: bold;
     font-style: italic;
 }
@@ -33,7 +33,7 @@
 /* Жирный курсив */
 @font-face {
     font-family: 'Cruinn';
-    src: url('fonts/cruinn/cruinn.ttf') format('truetype');
+    src: url('../fonts/cruinn/cruinn.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 }
