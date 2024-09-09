@@ -3,7 +3,7 @@
   <component name="WebServers">
     <option name="servers">
       <webServer id="04e0c111-890b-4022-aa12-7677a8660830" name="game" url="http://94.228.114.197">
-        <fileTransfer rootFolder="/var/www/tmp" accessType="SFTP" host="94.228.114.197" port="22" sshConfigId="d0888304-a2cc-4d7e-b473-6f001ee87ec2" sshConfig="root@94.228.114.197:22 password">
+        <fileTransfer rootFolder="/var/www/stack_game" accessType="SFTP" host="94.228.114.197" port="22" sshConfigId="d0888304-a2cc-4d7e-b473-6f001ee87ec2" sshConfig="root@94.228.114.197:22 password">
           <advancedOptions>
             <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
           </advancedOptions>
