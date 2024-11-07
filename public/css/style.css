@@ -1,7 +1,7 @@
 /* Обычное начертание */
 @font-face {
     font-family: 'Roboto';
-    src: url('../fonts/roboto/Roboto-Regular.ttf') format('truetype');
+    src: url('../assets/fonts/roboto/Roboto-Regular.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 }
@@ -9,7 +9,7 @@
 /* Жирное начертание */
 @font-face {
     font-family: 'Roboto';
-    src: url('../fonts/roboto/Roboto-Bold.ttf') format('truetype');
+    src: url('../assets/fonts/roboto/Roboto-Bold.ttf') format('truetype');
     font-weight: bold;
     font-style: normal;
 }
@@ -17,7 +17,7 @@
 /* Курсив */
 @font-face {
     font-family: 'Roboto';
-    src: url('../fonts/roboto/Roboto-Italic.ttf') format('truetype');
+    src: url('../assets/fonts/roboto/Roboto-Italic.ttf') format('truetype');
     font-weight: normal;
     font-style: italic;
 }
@@ -25,7 +25,7 @@
 /* Жирный курсив */
 @font-face {
     font-family: 'Roboto';
-    src: url('../fonts/roboto/Roboto-BoldItalic.ttf') format('truetype');
+    src: url('../assets/fonts/roboto/Roboto-BoldItalic.ttf') format('truetype');
     font-weight: bold;
     font-style: italic;
 }
@@ -33,7 +33,7 @@
 /* Жирный курсив */
 @font-face {
     font-family: 'Cruinn';
-    src: url('../fonts/cruinn/cruinn.ttf') format('truetype');
+    src: url('../assets/fonts/cruinn/cruinn.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 }
@@ -111,7 +111,6 @@ button, input {
     justify-content: center;
 }
 
-
 #score::before {
     content: '';
     position: absolute;
@@ -126,11 +125,19 @@ button, input {
 
 .container-for-word
 {
-    
-    width: 80%;
     margin: 0 auto;
     position: relative;
     top: 190px;
+}
+
+.small-container
+{
+    width: 70%;
+}
+
+.large-container, .medium-container
+{
+    width: 100%;
 }
 
 .row
@@ -142,17 +149,30 @@ button, input {
 .letter
 {
     font-family: "Courier New", sans-serif;
-    font-size: 50px;
     font-weight: bold;
     color: #ffffff;
-
     background-color: rgba(0, 0, 0, 0.2); /* Прозрачный черный фон */
     border-radius: 20%;
-    padding: 10px;
     backdrop-filter: blur(100px); /* Размытие фона */
     text-transform: capitalize;
 }
 
+.small-letter
+{
+    font-size: 60px;
+    padding: 5px 10px;
+}
+
+.medium-letter
+{
+    font-size: 50px;
+    padding: 5px 10px;
+}
+
+.large-letter
+{
+
+}
 
 /* Стиль для кнопок */
 #btn_again, #btn_start {
